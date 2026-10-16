@@ -1,0 +1,27 @@
+name: ATB 24/7 Multi-Market Rotator & Continual Learner
+
+on:
+  schedule:
+    - cron: '15 10 * * *'   # Daily 15:45 IST
+  workflow_dispatch:
+
+jobs:
+  run-rotator-and-retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ATB Repository
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: pip install numpy
+      - name: Execute v5.2 Multi-Market Rotator & INT8 Continual Retraining
+        run: python3 continual_learning_rotator.py
+      - name: Commit Updated Audit Log & Retrained INT8 Weights
+        run: |
+          git config --local user.email "anonymous-hss@users.noreply.github.com"
+          git config --local user.name "Anonymous-hss"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(bot): auto-update 24/7 rotation audit & INT8 continual weights" && git push)
